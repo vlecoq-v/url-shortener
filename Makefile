@@ -14,5 +14,8 @@ docker.build: ## build the app inside docker via docker-compose
 docker.logs: ## show the logs of the app
 	docker-compose logs -f
 
+docker.clean: ## clean volume for a fresh start
+	docker volume rm url-shortener_postgres_data
+
 down: ## shuts down project dockers
 	docker-compose down

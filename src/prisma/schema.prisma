@@ -1,0 +1,18 @@
+datasource db {
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
+}
+
+generator client {
+        provider      = "prisma-client-js"
+        binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+model Url {
+        id              Int       @id @default(autoincrement())
+        baseUrl         String
+        path            String
+        slug            String    @unique
+        createdAt       DateTime  @default(now())
+        deprecationDate DateTime?
+}

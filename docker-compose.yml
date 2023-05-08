@@ -1,15 +1,36 @@
 version: "3.9"
 
-services:  
+services:
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: url_shortener
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: psql -h localhost -p 5432 -U postgres -v ON_ERROR_STOP=1 -c 'SELECT version()' &> /dev/null
+      interval: 2s
+      timeout: 30s
+      retries: 15
   server:
-    build: .
+    build:
+      context: .
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
     ports:
       - '3000:3000'
-    # depends_on:
-    #   - db
     volumes:
       - ./src:/app/src
-    command: npm run dev:server
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/url_shortener
+      POSTGRES_HOST: postgres://db
+      POSTGRES_PORT: 5432
 
 volumes:
   postgres_data:
