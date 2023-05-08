@@ -9,10 +9,11 @@ generator client {
 }
 
 model Url {
-        id              Int       @id @default(autoincrement())
         baseUrl         String
         path            String
-        slug            String    @unique
+        slug            String
         createdAt       DateTime  @default(now())
         deprecationDate DateTime?
+
+        @@id([baseUrl, slug])
 }

@@ -1,41 +1,48 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Express from 'express'
-import { PrismaClient } from '@prisma/client'
+import { Url } from '@prisma/client'
+import { createHash } from 'crypto'
+import Cache from 'node-cache'
+import { getUrl, upsertUrl } from './url'
 
 const app = Express()
-app.use(Express.json());
+app.use(Express.json())
 
-// app.get('/', async (req, res) => {
-// 	res.send('hello Worlds')
-// })
 
-// SET UP PRISMA ORM
-const prisma = new PrismaClient()
+// SLUG AND CACHE 
 
-async function createUrl(baseUrl: string, path: string, slug: string, deprecationDate?: Date) {
-  const url = await prisma.url.create({
-    data: {
-      baseUrl,
-      path,
-      slug,
-      deprecationDate,
-    },
-  })
+const MAX_CACHE_ENTRIES = 100
+const pathSlugCache = new Cache({
+  stdTTL: 60 * 60, // 1 hour
+  checkperiod: 120, // check for expired entries every 2 minutes
+  deleteOnExpire: true,
+  useClones: false,
+  maxKeys: MAX_CACHE_ENTRIES,
+})
 
-  return url
+/** get a slug from cache or create one from Hash */
+export function getSlug(path: string): string {
+  if (pathSlugCache.has(path)) { console.log('have it')
+  return pathSlugCache.get(path)! }
+  const hash = createHash('sha256')
+  const slug = hash.update(path).digest('hex').substring(0, 8)
+  pathSlugCache.set(path, slug)
+  return slug
 }
 
-export interface TypedRequestBody<T> extends Express.Request {
-    body: T
-}
 
+// ROUTER
 
-app.post('/url', async (
-  req: TypedRequestBody<{ base_url: string, path: string , slug: string}>,
-  res: Express.Response,
-) => {
+app.post<object, Url,{ base_url: string, path: string }, object, object>('/url', async (req, res) => {
   console.log(req.body)
-	const url = await createUrl(req.body.base_url, req.body.path, req.body.slug + Date.now())
-	res.status(200).json(url)
+	const url = await upsertUrl(req.body.base_url, req.body.path)
+	res.send(url)
 }) 
+
+app.get<object, {url: string}| object, object, { base_url: string, slug: string }, object>('/url', async (req, res) => {
+  console.log(req.query)
+  const url = await getUrl(req.query.base_url, req.query.slug)
+  res.send(url ? {url: `${url.baseUrl}/${url.slug}`}: {})
+})
 
 app.listen(3000, () => { console.log('Server running on port 3000') })

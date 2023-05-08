@@ -4,9 +4,10 @@
   "description": "ts express postgres url-shortener",
   "main": "dist/index.ts",
   "scripts": {
-    "dev:prisma:migrate": "npx prisma migrate dev --preview-feature --schema=./src/prisma/schema.prisma",
+    "dev:prisma:migrate": "npx prisma migrate dev",
     "dev:server": "nodemon --watch './src/*.ts' --watch './src/**/*.prisma' --exec 'ts-node' src/server.ts",
-    "dev": "npm-run-all dev:prisma:migrate dev:server",
+    "prisma:generate": "npx prisma generate",
+    "dev": "npm-run-all prisma:generate dev:server",
     "start": "tsc && node dist/server.js",
     "lint": "eslint .",
     "lint.fix": "eslint . --fix",
@@ -15,7 +16,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-cache": "^4.2.5",
+    "crypto": "^1.0.1",
     "express": "^4.18.2",
+    "nanoid": "^3.3.4",
+    "node-cache": "^5.1.2",
+    "node-ts-cache": "^4.4.0",
     "npm-run-all": "^4.1.5",
     "prisma": "^4.13.0",
     "ts-node": "^10.9.1",
@@ -24,11 +30,16 @@
   "devDependencies": {
     "@prisma/client": "^4.13.0",
     "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.1",
     "@types/node": "^20.1.0",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
     "eslint": "^8.40.0",
-    "nodemon": "^2.0.22"
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
   },
-  "prisma.schema": "src/prisma/schema.prisma"
+  "prisma": {
+    "schema": "./src/prisma/schema.prisma"
+  }
 }

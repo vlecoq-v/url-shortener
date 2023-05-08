@@ -16,6 +16,8 @@ services:
       interval: 2s
       timeout: 30s
       retries: 15
+    stdin_open: true
+    tty: true
   server:
     build:
       context: .
