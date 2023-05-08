@@ -1,6 +1,5 @@
 import Express from 'express'
 import { Url } from '@prisma/client'
-// import { createHash } from 'crypto'
 import Cache from 'node-cache'
 import { getUrl, upsertUrl } from './url'
 import { createHash } from 'crypto'
