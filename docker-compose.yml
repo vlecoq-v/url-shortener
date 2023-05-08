@@ -16,8 +16,6 @@ services:
       interval: 2s
       timeout: 30s
       retries: 15
-    stdin_open: true
-    tty: true
   server:
     build:
       context: .
@@ -33,6 +31,7 @@ services:
       DATABASE_URL: postgres://postgres:password@db:5432/url_shortener
       POSTGRES_HOST: postgres://db
       POSTGRES_PORT: 5432
+      NODE_ENV: dev
 
 volumes:
   postgres_data:

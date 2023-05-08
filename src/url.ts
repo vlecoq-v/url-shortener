@@ -1,8 +1,7 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "./prisma/prisma"
 import { getSlug } from "./server"
 
 // ORM FUNCTIONS
-const prisma = new PrismaClient()
 
 export async function upsertUrl(baseUrl: string, path: string) {
   const tomorrow = new Date()
